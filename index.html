@@ -1,0 +1,1779 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>甜點標本室｜內用系統</title>
+<style>
+  :root {
+    --cream: #faf6ef;
+    --paper: #fffdf8;
+    --ink: #3e2f25;
+    --cocoa: #6b4f3a;
+    --gold: #c9a86a;
+    --rose: #b9838a;
+    --danger: #c0392b;
+    --ok: #2e7d4f;
+    --warm: #d46a4a;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  body {
+    font-family: "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif;
+    background: var(--cream);
+    color: var(--ink);
+    min-height: 100vh;
+    padding: 16px;
+    max-width: 720px;
+    margin: 0 auto;
+  }
+
+  /* ── 店頭 ─────────────────────────── */
+  header {
+    position: relative;
+    text-align: center;
+    padding: 20px 16px 16px;
+    background: var(--paper);
+    border: 1px solid #e7dfd0;
+    border-radius: 18px;
+    box-shadow: 0 2px 10px rgba(62,47,37,.08);
+    margin-bottom: 14px;
+  }
+  .reset-btn {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    font-size: .95rem;
+    font-weight: 800;
+    color: var(--cocoa);
+    background: #efe6d8;
+    border: 1px solid #d9cdb9;
+    border-radius: 10px;
+    padding: 9px 13px;
+    cursor: pointer;
+    white-space: nowrap;
+    line-height: 1.3;
+  }
+  .reset-btn:active { transform: scale(.95); }
+  header h1 {
+    font-size: 2rem;
+    letter-spacing: .35em;
+    text-indent: .35em;
+    color: var(--cocoa);
+  }
+  header .sub {
+    margin-top: 6px;
+    font-size: .98rem;
+    color: var(--gold);
+    letter-spacing: .2em;
+  }
+
+  /* ── 分頁導航 ────────────────────────── */
+  nav.tabs { display: flex; gap: 8px; margin-bottom: 14px; }
+  .tab-btn {
+    flex: 1;
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+    font-size: 1.25rem; font-weight: 800; letter-spacing: .1em;
+    color: var(--cocoa); background: var(--paper);
+    border: 1px solid #e7dfd0; border-radius: 14px;
+    padding: 14px 6px; cursor: pointer;
+    box-shadow: 0 2px 6px rgba(62,47,37,.06);
+  }
+  .tab-btn.active {
+    background: var(--cocoa); border-color: var(--cocoa); color: #fff8ec;
+  }
+  .tab-badge {
+    min-width: 30px; text-align: center;
+    font-size: .95rem; font-weight: 800; color: #fff;
+    background: var(--rose); border-radius: 999px; padding: 2px 9px;
+  }
+  .tab-btn.active .tab-badge { background: var(--gold); color: #4a3518; }
+
+  .tab-panel { display: none; }
+  .tab-panel.open { display: block; }
+
+  /* ── 共用區塊 ─────────────────────── */
+  .card {
+    background: var(--paper);
+    border: 1px solid #e7dfd0;
+    border-radius: 18px;
+    box-shadow: 0 2px 10px rgba(62,47,37,.08);
+    padding: 20px;
+    margin-bottom: 16px;
+  }
+  .card h2 { font-size: 1.3rem; color: var(--cocoa); margin-bottom: 14px; letter-spacing: .1em; }
+
+  label { display: block; font-size: 1.1rem; font-weight: 700; margin-bottom: 8px; }
+
+  input[type="text"], select, textarea {
+    width: 100%;
+    font-size: 1.35rem;
+    padding: 13px 16px;
+    border: 2px solid #d9cdb9;
+    border-radius: 12px;
+    background: #fffefb;
+    color: var(--ink);
+    outline: none;
+    font-family: inherit;
+  }
+  input[type="text"]:focus, select:focus, textarea:focus { border-color: var(--gold); }
+  textarea { min-height: 64px; resize: vertical; font-size: 1.15rem; }
+
+  .error {
+    display: none; margin-top: 8px;
+    font-size: 1.15rem; font-weight: 700; color: var(--danger);
+  }
+  .error.show { display: block; }
+
+  .size-group { display: flex; gap: 10px; margin-top: 4px; }
+  .size-btn {
+    flex: 1; font-size: 1.6rem; font-weight: 800; padding: 16px 0;
+    border: 2px solid #d9cdb9; border-radius: 12px;
+    background: #fffefb; color: var(--cocoa); cursor: pointer; transition: all .15s;
+  }
+  .size-btn.active {
+    background: var(--cocoa); border-color: var(--cocoa);
+    color: #fff8ec; transform: scale(1.04);
+  }
+  .size-note { font-size: .95rem; color: #8a7a68; margin-top: 6px; }
+
+  .btn-take {
+    width: 100%; margin-top: 16px;
+    font-size: 1.8rem; font-weight: 900; letter-spacing: .3em; text-indent: .3em;
+    padding: 18px 0; color: #fff8ec;
+    background: linear-gradient(160deg, #7d5c43, var(--cocoa));
+    border: none; border-radius: 14px; cursor: pointer;
+    box-shadow: 0 4px 12px rgba(107,79,58,.4);
+    transition: transform .12s;
+  }
+  .btn-take:active { transform: scale(.97); }
+
+  .list-header {
+    display: flex; justify-content: space-between; align-items: baseline;
+    gap: 10px; margin-bottom: 12px;
+  }
+  .list-header h2 { font-size: 1.3rem; color: var(--cocoa); letter-spacing: .1em; margin: 0; }
+  .count { font-size: 1.1rem; font-weight: 800; color: var(--rose); }
+  .count.ok { color: var(--ok); }
+  .section-note { font-size: .95rem; color: #8a7a68; margin: -6px 0 12px; line-height: 1.6; }
+
+  .empty {
+    text-align: center; font-size: 1.15rem; color: #a2937f;
+    padding: 24px 8px; line-height: 1.7;
+  }
+
+  .queue-item {
+    display: flex; align-items: center; gap: 12px;
+    padding: 14px 12px;
+    border: 1px solid #e7dfd0; border-left: 6px solid var(--gold);
+    border-radius: 14px; background: #fffefb; margin-bottom: 12px;
+  }
+  .queue-item:last-child { margin-bottom: 0; }
+  .queue-item.next { border-left-color: var(--rose); background: #fdf3ec; }
+  .queue-item.next .qnum::after {
+    content: '下一組'; display: block;
+    font-size: .8rem; font-weight: 800; color: var(--rose); letter-spacing: .15em;
+  }
+  .queue-item.called { border-left-color: var(--warm); background: #fef0e6; border-color: #ecd0bd; }
+  .queue-item.called .qnum { color: var(--warm); }
+  .queue-item.called .qnum::after {
+    content: '叫號中'; display: block;
+    font-size: .8rem; font-weight: 800; color: var(--warm); letter-spacing: .15em;
+  }
+  .queue-item.skipped { border-left-color: #a2937f; background: #f3efe6; }
+  .queue-item.skipped .qnum { color: #8a7a68; }
+
+  .qnum { font-size: 1.9rem; font-weight: 900; color: var(--cocoa); min-width: 86px; letter-spacing: .05em; }
+  .qinfo { flex: 1; min-width: 0; }
+  .qname { font-size: 1.45rem; font-weight: 800; word-break: break-all; }
+  .qmeta { font-size: 1.02rem; color: #6f6052; margin-top: 4px; line-height: 1.5; }
+  .qmeta strong { color: var(--ink); }
+
+  .qactions { display: flex; flex-direction: column; gap: 8px; }
+  .btn-sm {
+    font-size: 1.05rem; font-weight: 800; padding: 12px 14px;
+    border-radius: 10px; border: none; cursor: pointer; white-space: nowrap;
+  }
+  .btn-seat { background: var(--ok); color: #fff; }
+  .btn-call { background: var(--gold); color: #4a3518; }
+  .btn-skip { background: #efe6d8; color: var(--cocoa); border: 1px solid #d9cdb9; }
+  .btn-back { background: var(--rose); color: #fff; }
+  .btn-sm:active { transform: scale(.95); }
+
+  /* ── 桌位 ───────────────────────────── */
+  .tables-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 12px; }
+  .table-card {
+    border: 1px solid #e7dfd0; border-top: 5px solid var(--ok);
+    border-radius: 14px; background: #fffefb; padding: 13px 12px; text-align: center;
+  }
+  .table-card.occupied { border-top-color: var(--warm); background: #fef3ec; border-color: #ecd0bd; }
+  .tno { font-size: 1.45rem; font-weight: 900; color: var(--cocoa); }
+  .table-card.occupied .tno { color: var(--warm); }
+  .tcap { font-size: .92rem; color: #8a7a68; margin-top: 2px; }
+  .tstatus { margin-top: 8px; font-size: 1.05rem; font-weight: 800; }
+  .table-card.free .tstatus { color: var(--ok); }
+  .table-card.occupied .tstatus { color: var(--warm); }
+  .tguest { margin-top: 6px; font-size: 1rem; line-height: 1.55; word-break: break-all; }
+  .tguest strong { font-size: 1.1rem; }
+  .btn-release {
+    margin-top: 9px; width: 100%; font-size: .98rem; font-weight: 800;
+    padding: 10px 0; border-radius: 10px; border: 1px solid #d9cdb9;
+    background: #efe6d8; color: var(--cocoa); cursor: pointer;
+  }
+  .btn-release:active { transform: scale(.96); }
+
+  /* ── 點餐：無桌提示 ────────────────────── */
+  .warn-box {
+    font-size: 1.25rem; font-weight: 800; color: var(--danger);
+    line-height: 1.8; background: #fbeede; border: 1px dashed var(--danger);
+    border-radius: 14px; padding: 20px; text-align: center;
+  }
+
+  /* ── 菜單 ───────────────────────────── */
+  .menu-cat {
+    font-size: 1.15rem; font-weight: 900; color: var(--cocoa);
+    letter-spacing: .25em; border-bottom: 2px solid var(--gold);
+    padding-bottom: 6px; margin: 18px 0 12px;
+  }
+  .menu-cat:first-child { margin-top: 4px; }
+  .menu-item {
+    display: flex; align-items: center; gap: 10px;
+    padding: 12px; border: 1px solid #ece2d0; border-radius: 14px;
+    background: #fffefb; margin-bottom: 10px;
+  }
+  /* 有圖片的品項：左圖 96×80、右側資訊 */
+  .mi-img {
+    width: 96px; height: 80px; object-fit: cover; flex-shrink: 0;
+    border-radius: 10px; border: 1px solid #e7dfd0; background: #f6efe3;
+  }
+  .mi-info { flex: 1; min-width: 0; }
+  .mi-name { font-size: 1.2rem; font-weight: 800; }
+  .mi-unit { font-size: .9rem; color: #8a7a68; margin-left: 4px; }
+  .mi-price { font-size: 1.15rem; font-weight: 900; color: var(--cocoa); margin-top: 2px; }
+  .mi-allergen { font-size: .92rem; color: #a25b4d; margin-top: 4px; line-height: 1.5; }
+  .mi-allergen strong { color: var(--danger); }
+  .btn-add {
+    font-size: 1.15rem; font-weight: 800; padding: 12px 18px;
+    border: none; border-radius: 12px; background: var(--gold); color: #4a3518;
+    cursor: pointer; white-space: nowrap;
+  }
+  .btn-add:active { transform: scale(.95); }
+  .btn-add:disabled {
+    background: #c9c2b4; color: #fffdf8; cursor: not-allowed;
+  }
+  .menu-item.soldout { opacity: .55; }
+  .mi-soldout {
+    display: inline-block; background: var(--danger); color: #fff;
+    font-size: .78rem; font-weight: 900; letter-spacing: .1em;
+    border-radius: 6px; padding: 2px 8px; margin-left: 8px; vertical-align: middle;
+  }
+
+  /* ── 售完管理 ───────────────────────── */
+  .soldout-grid { display: flex; flex-wrap: wrap; gap: 8px; }
+  .soldout-item {
+    display: flex; flex-direction: column; align-items: center; gap: 2px;
+    font-size: 1.02rem; font-weight: 800; padding: 9px 12px;
+    border-radius: 12px; border: 2px solid var(--ok);
+    background: #eef5ee; color: var(--ok); cursor: pointer; min-width: 100px;
+  }
+  .soldout-item small { font-size: .78rem; font-weight: 800; letter-spacing: .08em; }
+  .soldout-item.off { border-color: var(--danger); background: #fde8e4; color: var(--danger); }
+  .soldout-item:active { transform: scale(.95); }
+
+  /* ── 待送單 ─────────────────────────── */
+  .cart-line {
+    display: flex; align-items: center; gap: 10px;
+    padding: 10px 0; border-bottom: 1px dashed #e7dfd0;
+  }
+  .cart-line:last-of-type { border-bottom: none; }
+  .cart-name { flex: 1; font-size: 1.15rem; font-weight: 800; min-width: 0; }
+  .cart-name small { color: #8a7a68; font-weight: 600; }
+  .qty-btn {
+    width: 38px; height: 38px; font-size: 1.3rem; font-weight: 900;
+    border: 1px solid #d9cdb9; background: #fffefb; color: var(--cocoa);
+    border-radius: 10px; cursor: pointer;
+  }
+  .qty-num { width: 44px; text-align: center; font-size: 1.25rem; font-weight: 900; }
+  .cart-subtotal {
+    display: flex; justify-content: space-between; align-items: baseline;
+    margin-top: 12px; padding-top: 10px; border-top: 2px solid var(--cocoa);
+    font-size: 1.15rem; font-weight: 800;
+  }
+  .cart-subtotal .sum { font-size: 1.6rem; font-weight: 900; color: var(--cocoa); }
+
+  /* ── 過敏警示（小計上方） ─────────────── */
+  .allergy-warn {
+    background: var(--danger); color: #fff;
+    font-size: 1.2rem; font-weight: 900; letter-spacing: .08em;
+    text-align: center; line-height: 1.6;
+    padding: 14px 12px; border-radius: 12px;
+    border: 2px solid #8f2418;
+    margin: 4px 0 2px;
+    box-shadow: 0 0 0 3px #ffd9d0;
+  }
+
+  .quick-notes { display: flex; flex-wrap: wrap; gap: 8px; margin: 4px 0 10px; }
+  .qn-chip {
+    font-size: .98rem; font-weight: 700; padding: 9px 13px;
+    border-radius: 999px; border: 1px solid var(--gold);
+    background: #fffdf3; color: var(--cocoa); cursor: pointer;
+  }
+  .qn-chip:active { transform: scale(.95); }
+
+  .btn-send {
+    width: 100%; margin-top: 12px;
+    font-size: 1.5rem; font-weight: 900; letter-spacing: .2em; text-indent: .2em;
+    padding: 17px 0; color: #fff8ec; border: none; border-radius: 14px;
+    background: linear-gradient(160deg, #b3502e, var(--warm));
+    cursor: pointer; box-shadow: 0 4px 12px rgba(212,106,74,.4);
+  }
+  .btn-send:active:not(:disabled) { transform: scale(.97); }
+  .btn-send:disabled {
+    background: #c9c2b4; box-shadow: none; cursor: not-allowed; color: #fffdf8;
+  }
+
+  /* ── 今日已結帳條 ────────────────────── */
+  .daily-bar {
+    display: flex; justify-content: space-between; align-items: baseline; gap: 12px;
+    background: var(--paper); border: 1px dashed var(--gold);
+    border-radius: 14px; padding: 10px 16px; margin-bottom: 14px;
+    font-size: 1rem; font-weight: 800; color: var(--cocoa);
+  }
+  .daily-bar strong { font-size: 1.45rem; color: var(--ink); letter-spacing: .03em; }
+  .daily-bar .muted { font-size: .9rem; color: #a2937f; font-weight: 700; }
+
+  /* ── 本桌已送單 ───────────────────────── */
+  .to-line {
+    display: flex; justify-content: space-between; align-items: center; gap: 10px;
+    padding: 10px 0; border-bottom: 1px dashed #e7dfd0; flex-wrap: wrap;
+  }
+  .to-line:last-child { border-bottom: none; }
+  .to-info { min-width: 0; }
+  .to-no { font-size: 1.1rem; font-weight: 900; color: var(--cocoa); }
+  .to-items { font-size: .95rem; color: #6f6052; margin-top: 2px; line-height: 1.5; }
+  .to-right { text-align: right; }
+  .to-total { font-size: 1.1rem; font-weight: 900; color: var(--ink); margin-top: 4px; }
+  .pill {
+    display: inline-block; font-size: .82rem; font-weight: 800;
+    border-radius: 999px; padding: 3px 11px; letter-spacing: .05em;
+  }
+  .pill-pending   { background: #fbeede; color: #b3502e; border: 1px solid #ecd0bd; }
+  .pill-preparing { background: #fdf3c8; color: #8a6d1a; border: 1px solid #e0c94a; }
+  .pill-done      { background: #dff0d8; color: #2e7d4f; border: 1px solid #cfe2d2; }
+  .to-sum {
+    display: flex; justify-content: space-between; align-items: baseline;
+    border-top: 2px solid var(--cocoa); margin-top: 10px; padding-top: 10px;
+    font-size: 1.1rem; font-weight: 800;
+  }
+  .to-sum strong { font-size: 1.4rem; color: var(--cocoa); }
+  .btn-checkout {
+    width: 100%; margin-top: 10px;
+    font-size: 1.4rem; font-weight: 900; letter-spacing: .25em; text-indent: .25em;
+    padding: 17px 0; color: #fff8ec; border: none; border-radius: 14px;
+    background: linear-gradient(160deg, #2e7d4f, #1f5c37);
+    cursor: pointer; box-shadow: 0 4px 12px rgba(46,125,79,.4);
+  }
+  .btn-checkout:active:not(:disabled) { transform: scale(.97); }
+  .btn-checkout:disabled {
+    background: #c9c2b4; box-shadow: none; cursor: not-allowed; color: #fffdf8;
+  }
+
+  /* ── 廚房：三欄看板 ─────────────────── */
+  .kanban {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    align-items: start;
+  }
+  .kanban-col {
+    border-radius: 16px;
+    padding: 10px;
+    background: #f6efe3;
+    border: 1px solid #e7dfd0;
+    min-height: 140px;
+  }
+  .col-pending   { background: #fbeede; border-color: #ecd0bd; }
+  .col-preparing { background: #fdf6d8; border-color: #ead98a; }
+  .col-done      { background: #eef5ee; border-color: #cfe2d2; }
+  .kanban-title {
+    display: flex; align-items: center; justify-content: space-between;
+    font-size: 1.05rem; font-weight: 900; letter-spacing: .15em;
+    padding: 2px 4px 10px; color: var(--cocoa);
+  }
+  .kanban-count {
+    min-width: 30px; text-align: center;
+    font-size: .9rem; font-weight: 800;
+    background: var(--cocoa); color: #fff8ec;
+    border-radius: 999px; padding: 2px 9px; letter-spacing: 0;
+  }
+
+  .order-card {
+    border: 1px solid #ecd0bd; border-left: 5px solid var(--warm);
+    background: #fffdf8; border-radius: 12px; padding: 11px; margin-bottom: 10px;
+  }
+  .order-card:last-child { margin-bottom: 0; }
+  .col-done .order-card { opacity: .75; border-left-color: var(--ok); }
+
+  /* 備註置頂：過敏紅底、一般黃底 */
+  .order-note {
+    margin: 0 0 8px; padding: 8px 10px; border-radius: 9px;
+    font-size: .95rem; line-height: 1.5;
+    background: #fdf3c8; border: 1px solid #e0c94a; color: #8a6d1a; font-weight: 800;
+  }
+  .order-note.allergy {
+    background: var(--danger); border: 2px solid #8f2418;
+    color: #fff; font-weight: 900; font-size: 1rem;
+  }
+  .order-no { font-size: 1.2rem; font-weight: 900; color: var(--warm); letter-spacing: .05em; }
+  .order-where { font-size: .98rem; font-weight: 800; margin-top: 3px; }
+  .order-time { font-size: .85rem; color: #8a7a68; margin-top: 2px; }
+  .order-items { margin: 8px 0 0; padding-left: 0; list-style: none; }
+  .order-items li {
+    display: flex; justify-content: space-between; gap: 8px;
+    font-size: 1.02rem; font-weight: 700; padding: 2px 0;
+  }
+  .order-total {
+    display: flex; justify-content: space-between;
+    border-top: 1px dashed #e0c4a8; margin-top: 8px; padding-top: 6px;
+    font-size: 1rem; font-weight: 800;
+  }
+  .btn-prep {
+    width: 100%; margin-top: 9px;
+    font-size: 1.05rem; font-weight: 800; letter-spacing: .1em;
+    padding: 12px 0; border: none; border-radius: 10px;
+    background: var(--gold); color: #4a3518; cursor: pointer;
+  }
+  .btn-done {
+    width: 100%; margin-top: 9px;
+    font-size: 1.05rem; font-weight: 800; letter-spacing: .1em;
+    padding: 12px 0; border: none; border-radius: 10px;
+    background: var(--ok); color: #fff; cursor: pointer;
+  }
+  .btn-prep:active, .btn-done:active { transform: scale(.96); }
+
+  /* ── Toast 通知 ───────────────────────── */
+  .toast {
+    position: fixed; left: 50%; bottom: 30px; transform: translateX(-50%) translateY(20px);
+    background: var(--cocoa); color: #fff8ec;
+    font-size: 1.15rem; font-weight: 800; padding: 14px 22px; border-radius: 14px;
+    box-shadow: 0 8px 24px rgba(0,0,0,.3); opacity: 0; pointer-events: none;
+    transition: all .25s; z-index: 60; max-width: 90vw;
+  }
+  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+  /* ── 選桌 Modal ───────────────────────── */
+  .modal-overlay {
+    position: fixed; inset: 0; background: rgba(30,20,15,.55);
+    display: none; align-items: center; justify-content: center;
+    padding: 16px; z-index: 50;
+  }
+  .modal-overlay.open { display: flex; }
+  .modal-card {
+    background: var(--paper); width: 100%; max-width: 420px; max-height: 82vh;
+    overflow-y: auto; border-radius: 18px; padding: 22px;
+    box-shadow: 0 12px 40px rgba(0,0,0,.35);
+  }
+  .modal-card h2 { font-size: 1.35rem; color: var(--cocoa); letter-spacing: .08em; }
+  .modal-sub { margin-top: 8px; font-size: 1.05rem; color: #6f6052; line-height: 1.6; }
+  .modal-sub strong { color: var(--ink); }
+  .modal-hint {
+    margin-top: 14px; font-size: 1.15rem; font-weight: 800; color: var(--danger);
+    line-height: 1.7; background: #fbeede; border: 1px dashed var(--danger);
+    border-radius: 12px; padding: 14px;
+  }
+  .modal-table-btn {
+    display: flex; justify-content: space-between; align-items: center; gap: 10px;
+    width: 100%; font-size: 1.25rem; font-weight: 800; color: var(--cocoa);
+    background: #fffdf3; border: 2px solid var(--gold); border-radius: 12px;
+    padding: 16px 14px; margin-top: 12px; cursor: pointer; text-align: left;
+  }
+  .modal-table-btn:active { transform: scale(.97); background: #f7ecd9; }
+  .modal-table-btn small { font-size: .9rem; font-weight: 700; color: var(--ok); }
+  .btn-modal-close {
+    width: 100%; margin-top: 14px; font-size: 1.2rem; font-weight: 800;
+    padding: 15px 0; border: none; border-radius: 12px;
+    background: #efe6d8; color: var(--cocoa); cursor: pointer;
+  }
+
+  /* ── 店規 ───────────────────────────── */
+  footer {
+    background: var(--paper); border: 1px dashed var(--gold);
+    border-radius: 14px; padding: 14px 16px; font-size: .98rem;
+    line-height: 1.9; color: var(--cocoa);
+  }
+  footer strong { letter-spacing: .15em; }
+
+  @media (max-width: 480px) {
+    body { padding: 10px; }
+    header h1 { font-size: 1.55rem; }
+    .tab-btn { font-size: 1.05rem; padding: 12px 4px; letter-spacing: 0; }
+    .tab-badge { font-size: .85rem; min-width: 26px; }
+    input[type="text"], select { font-size: 1.2rem; }
+    .queue-item { flex-wrap: wrap; }
+    .qnum { min-width: 100%; font-size: 1.6rem; }
+    .qactions { flex-direction: row; width: 100%; }
+    .qactions .btn-sm { flex: 1; padding: 14px 4px; }
+    .tables-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+    .kanban { grid-template-columns: 1fr; }
+    /* 390px 手機：菜單圖片列不溢出 */
+    .menu-item { padding: 8px; gap: 8px; }
+    .mi-img { width: 96px; height: 80px; }
+    .mi-name { font-size: 1.05rem; }
+    .mi-allergen { font-size: .82rem; }
+    .btn-add { padding: 10px 8px; font-size: .92rem; letter-spacing: 0; }
+  }
+  @media (max-width: 560px) {
+    .kanban { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <button class="reset-btn" id="resetBtn" title="清空所有候位與訂單資料，重新開店">🔄 重新整理</button>
+  <h1>甜點標本室</h1>
+  <div class="sub">— 高級甜點店 · 內用系統 —</div>
+</header>
+
+<!-- 分頁導航 -->
+<nav class="tabs" aria-label="功能分頁">
+  <button class="tab-btn active" data-tab="tab-wait" id="tabBtnWait">候位<span class="tab-badge" id="badgeWait">0</span></button>
+  <button class="tab-btn" data-tab="tab-order" id="tabBtnOrder">點餐<span class="tab-badge" id="badgeTables">0</span></button>
+  <button class="tab-btn" data-tab="tab-kitchen" id="tabBtnKitchen">廚房<span class="tab-badge" id="badgeKitchen">0</span></button>
+</nav>
+
+<!-- 今日已結帳累計條 -->
+<div class="daily-bar" aria-label="今日已結帳累計">
+  <span>💰 今日已結帳 <strong id="dailyCheckoutTotal">NT$0</strong></span>
+  <span class="muted" id="dailyCheckoutCount">0 桌</span>
+</div>
+
+<!-- ══════════ 分頁：候位 ══════════ -->
+<main class="tab-panel open" id="tab-wait" role="tabpanel" aria-labelledby="tabBtnWait">
+
+  <section class="card" aria-label="取號">
+    <h2>🛎 取號</h2>
+    <label for="guestName">客人姓名</label>
+    <input type="text" id="guestName" placeholder="請輸入姓名…" autocomplete="off" maxlength="30">
+    <div class="error" id="nameError">請填客人姓名</div>
+
+    <label style="margin-top:16px">人數（每桌最多 4 位）</label>
+    <div class="size-group" id="sizeGroup" role="group" aria-label="用餐人數"></div>
+    <div class="size-note">若超過 4 人，請分桌或洽櫃檯。</div>
+
+    <button class="btn-take" id="takeNumberBtn">取號</button>
+  </section>
+
+  <section class="card" aria-label="已叫號">
+    <div class="list-header">
+      <h2>📣 已叫號</h2>
+      <span class="count" id="calledCount"></span>
+    </div>
+    <div class="section-note">叫號中的客人才能辦理入座；入座時請選擇可以坐得下的空桌。</div>
+    <div id="calledList"></div>
+  </section>
+
+  <section class="card" aria-label="等候名單">
+    <div class="list-header">
+      <h2>📋 等候名單</h2>
+      <span class="count" id="queueCount"></span>
+    </div>
+    <div id="queueList"></div>
+  </section>
+
+  <section class="card" aria-label="桌位">
+    <div class="list-header">
+      <h2>🪑 桌位</h2>
+      <span class="count ok" id="tablesSummary"></span>
+    </div>
+    <div class="tables-grid" id="tablesGrid"></div>
+  </section>
+
+  <section class="card" aria-label="已過號">
+    <div class="list-header">
+      <h2>⏭️ 已過號</h2>
+      <span class="count" id="skippedCount"></span>
+    </div>
+    <div class="section-note">客人回來後，按「客人回來了」即回到等候隊伍最後（保留原號碼）。</div>
+    <div id="skippedList"></div>
+  </section>
+</main>
+
+<!-- ══════════ 分頁：點餐 ══════════ -->
+<main class="tab-panel" id="tab-order" role="tabpanel" aria-labelledby="tabBtnOrder">
+
+  <section class="card" aria-label="選擇桌位">
+    <h2>🧾 點餐</h2>
+    <label for="orderTableSelect">用餐中的桌號（含客名）</label>
+    <select id="orderTableSelect"></select>
+
+    <div class="warn-box" id="noTablesHint" style="display:none">
+      目前沒有用餐中的桌子<br>請先到「候位」分頁為客人帶位入座 🪑
+    </div>
+  </section>
+
+  <section class="card" id="orderArea" style="display:none" aria-label="點餐">
+    <div class="list-header">
+      <h2>📖 菜單</h2>
+      <span class="count" id="orderTableLabel"></span>
+    </div>
+    <div id="menuList"></div>
+
+    <div class="menu-cat">🧾 待送單</div>
+    <div id="cartArea"></div>
+
+    <label for="orderNote" style="margin-top:16px">廚房備註（有過敏請寫明）</label>
+    <div class="quick-notes" id="quickNotes"></div>
+    <textarea id="orderNote" placeholder="例如：花生過敏，請特別標示…" maxlength="100"></textarea>
+
+    <button class="btn-send" id="sendOrderBtn" disabled>送出訂單</button>
+  </section>
+
+  <!-- 本桌已送單與結帳 -->
+  <section class="card" id="tableOrdersCard" style="display:none" aria-label="本桌已送單與結帳">
+    <div class="list-header">
+      <h2>🧮 本桌已送單</h2>
+      <span class="count" id="tableOrdersStatus"></span>
+    </div>
+    <div id="tableOrdersList"></div>
+    <div class="to-sum"><span>本桌合計</span><strong id="tableOrdersTotal">NT$0</strong></div>
+    <button class="btn-checkout" id="checkoutBtn" disabled>餐點全部完成才能結帳</button>
+  </section>
+</main>
+
+<!-- ══════════ 分頁：廚房（三欄看板＋售完管理） ══════════ -->
+<main class="tab-panel" id="tab-kitchen" role="tabpanel" aria-labelledby="tabBtnKitchen">
+  <section class="card" aria-label="售完管理">
+    <div class="list-header">
+      <h2>🍡 售完管理</h2>
+      <span class="count" id="soldoutCount"></span>
+    </div>
+    <div class="section-note">點一下切換「今日售完／販售中」；售完的餐點在點餐頁顯示「今日售完」且不能加入，待送單有售完品項時會擋下送單。</div>
+    <div class="soldout-grid" id="soldoutGrid"></div>
+  </section>
+  <section class="card" aria-label="廚房看板">
+    <div class="list-header">
+      <h2>👨‍🍳 廚房</h2>
+      <span class="count" id="kitchenCount"></span>
+    </div>
+    <div class="section-note">訂單依送出順序排列：按「開始製作」→ 製作中，出餐後按「出餐完成」→ 已完成。</div>
+    <div class="kanban">
+      <div class="kanban-col col-pending" aria-label="待製作">
+        <div class="kanban-title">待製作<span class="kanban-count" id="cntPending">0</span></div>
+        <div id="colPending"></div>
+      </div>
+      <div class="kanban-col col-preparing" aria-label="製作中">
+        <div class="kanban-title">製作中<span class="kanban-count" id="cntPreparing">0</span></div>
+        <div id="colPreparing"></div>
+      </div>
+      <div class="kanban-col col-done" aria-label="已完成">
+        <div class="kanban-title">已完成<span class="kanban-count" id="cntDone">0</span></div>
+        <div id="colDone"></div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<!-- 店規 -->
+<footer>
+  <strong>店內規則</strong><br>
+  ① 過號的客人回來後，排到隊伍最後<br>
+  ② 餐點全部完成才能結帳<br>
+  ③ 備註有過敏時，廚房要特別標示
+</footer>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<!-- 選桌 Modal -->
+<div class="modal-overlay" id="seatModal" role="dialog" aria-modal="true" aria-labelledby="seatModalTitle">
+  <div class="modal-card">
+    <h2 id="seatModalTitle">選擇桌位</h2>
+    <p class="modal-sub" id="seatModalSub"></p>
+    <div id="seatModalBody"></div>
+    <button class="btn-modal-close" id="seatModalClose">取消</button>
+  </div>
+</div>
+
+<script>
+'use strict';
+
+/* ─────────────────────────────
+   甜點標本室｜內用系統（單一 HTML）
+   localStorage 持久化，重新整理不會遺失
+   候位：waiting（等候中）／called（已叫號）／skipped（已過號）
+   桌位：free（空桌）／occupied（用餐中）
+   訂單：pending（未完成）／done（已完成）
+   待送單：每桌獨立，slips = { tableId: { items:[], note:'' } }
+   ───────────────────────────── */
+var STORAGE_LIST          = 'dessert_specimens_waitlist';
+var STORAGE_COUNTER       = 'dessert_specimens_counter';
+var STORAGE_SEEDED        = 'dessert_specimens_seeded';
+var STORAGE_TABLES        = 'dessert_specimens_tables';
+var STORAGE_ORDERS        = 'dessert_specimens_orders';
+var STORAGE_ORDER_COUNTER = 'dessert_specimens_order_counter';
+var STORAGE_SLIPS         = 'dessert_specimens_slips';
+var STORAGE_DAILY         = 'dessert_specimens_checkout_daily';
+var STORAGE_SOLDOUT       = 'dessert_specimens_soldout';
+
+var TABLE_CAPACITIES = [4, 4, 4, 4, 4, 4]; // 6 桌・每桌 4 人（可調整）
+
+var MENU = [
+  { cat: '甜點', name: '千層蛋糕',       unit: '一片', price: 180, allergen: '蛋、奶、麩質（小麥）', img: '菜單圖片/01_layer_cake.jpg' },
+  { cat: '甜點', name: '蒙布朗',         unit: '一個', price: 200, allergen: '蛋、奶、堅果（栗子／核桃／花生）、麩質', peanuts: true, img: '菜單圖片/02_mont_blanc.jpg' },
+  { cat: '甜點', name: '特級巧克力捲',   unit: '一個', price: 190, allergen: '蛋、奶、麩質、大豆、花生', peanuts: true, img: '菜單圖片/03_choc_roll.jpg' },
+  { cat: '甜點', name: '巴斯克乳酪蛋糕', unit: '一塊', price: 220, allergen: '蛋、奶', img: '菜單圖片/04_basque.jpg' },
+  { cat: '甜點', name: '肉桂捲',         unit: '一個', price: 180, allergen: '麩質、蛋、奶、花生', peanuts: true, img: '菜單圖片/05_cinnamon_roll.jpg' },
+  { cat: '飲料', name: '美式咖啡',       unit: '一杯', price: 130, allergen: '無（含咖啡因）', img: '菜單圖片/06_americano.jpg' },
+  { cat: '飲料', name: '手沖咖啡',       unit: '一杯', price: 200, allergen: '無（含咖啡因）', img: '菜單圖片/07_pour_over.jpg' },
+  { cat: '飲料', name: '日式抹茶拿鐵',   unit: '一杯', price: 170, allergen: '奶（含咖啡因）', img: '菜單圖片/08_matcha_latte.jpg' },
+  { cat: '飲料', name: '水果氣泡飲',     unit: '一杯', price: 130, allergen: '無（依當日水果）', img: '菜單圖片/09_fruit_soda.jpg' }
+];
+
+/* 快捷備註（點擊加入備註欄） */
+var QUICK_NOTES = ['花生過敏', '堅果過敏', '去冰', '微冰', '去咖啡因', '不加糖', '低糖', '去牛奶'];
+
+var queue = [];
+var tables = [];
+var orders = [];
+var slips = {};
+var daily = { date: '', total: 0, count: 0 };
+var soldout = []; // 今日售完的品項名稱
+var nextNumber = 1;
+var nextOrderNumber = 1;
+var selectedSize = 2;
+var seatingId = null;
+
+/* ── 格式化號碼 ── */
+function formatNumber(n) { return 'A' + String(n).padStart(3, '0'); }
+function formatOrderNo(n) { return 'K' + String(n).padStart(3, '0'); }
+function nt(n) { return 'NT$' + n; }
+
+/* ── 讀寫 localStorage：候位 ── */
+function normalizeItem(item) {
+  if (!item.status) item.status = 'waiting';
+  if (item.status === 'called' && !item.calledTime) item.calledTime = item.time || Date.now();
+  if (item.status === 'skipped' && !item.skippedTime) item.skippedTime = Date.now();
+  return item;
+}
+function loadData() {
+  try {
+    var raw = localStorage.getItem(STORAGE_LIST);
+    queue = raw ? JSON.parse(raw) : [];
+    if (!Array.isArray(queue)) queue = [];
+  } catch (e) { queue = []; }
+  queue = queue.map(normalizeItem);
+  var c = parseInt(localStorage.getItem(STORAGE_COUNTER) || '1', 10);
+  nextNumber = (isNaN(c) || c < 1) ? 1 : c;
+}
+function saveData() {
+  localStorage.setItem(STORAGE_LIST, JSON.stringify(queue));
+  localStorage.setItem(STORAGE_COUNTER, String(nextNumber));
+}
+
+/* ── 讀寫 localStorage：桌位 ── */
+function defaultTables() {
+  return TABLE_CAPACITIES.map(function (cap, i) {
+    return { id: 'T' + (i + 1), number: i + 1, capacity: cap, status: 'free', guestName: null, size: null, since: null };
+  });
+}
+function loadTables() {
+  var raw = null;
+  try { raw = localStorage.getItem(STORAGE_TABLES); } catch (e) { raw = null; }
+  if (raw) {
+    try {
+      tables = JSON.parse(raw);
+      if (!Array.isArray(tables) || tables.length === 0) tables = defaultTables();
+    } catch (e) { tables = defaultTables(); }
+  } else {
+    tables = defaultTables();
+    saveTables();
+  }
+}
+function saveTables() {
+  localStorage.setItem(STORAGE_TABLES, JSON.stringify(tables));
+}
+
+/* ── 讀寫 localStorage：訂單 ── */
+function loadOrders() {
+  try {
+    var raw = localStorage.getItem(STORAGE_ORDERS);
+    orders = raw ? JSON.parse(raw) : [];
+    if (!Array.isArray(orders)) orders = [];
+  } catch (e) { orders = []; }
+  var c = parseInt(localStorage.getItem(STORAGE_ORDER_COUNTER) || '1', 10);
+  nextOrderNumber = (isNaN(c) || c < 1) ? 1 : c;
+}
+function saveOrders() {
+  localStorage.setItem(STORAGE_ORDERS, JSON.stringify(orders));
+  localStorage.setItem(STORAGE_ORDER_COUNTER, String(nextOrderNumber));
+}
+
+/* ── 讀寫 localStorage：待送單（每桌獨立） ── */
+function loadSlips() {
+  try {
+    var raw = localStorage.getItem(STORAGE_SLIPS);
+    slips = raw ? JSON.parse(raw) : {};
+    if (!slips || typeof slips !== 'object' || Array.isArray(slips)) slips = {};
+  } catch (e) { slips = {}; }
+}
+function saveSlips() {
+  localStorage.setItem(STORAGE_SLIPS, JSON.stringify(slips));
+}
+function getSlip(tableId) {
+  if (!slips[tableId]) slips[tableId] = { items: [], note: '' };
+  if (!Array.isArray(slips[tableId].items)) slips[tableId].items = [];
+  if (typeof slips[tableId].note !== 'string') slips[tableId].note = '';
+  return slips[tableId];
+}
+function slipTotal(slip) {
+  return slip.items.reduce(function (sum, l) { return sum + l.price * l.qty; }, 0);
+}
+function containsPeanut(name) {
+  var m = MENU.find(function (i) { return i.name === name; });
+  return !!(m && m.peanuts);
+}
+function allergyWarningHtml(slip) {
+  var note = slip.note || '';
+  if (note.indexOf('花生') === -1 || note.indexOf('過敏') === -1) return '';
+  var hasPeanutItem = slip.items.some(function (l) { return containsPeanut(l.name); });
+  if (!hasPeanutItem) return '';
+  return '<div class="allergy-warn" role="alert">⚠ 請先向客人確認過敏資訊</div>';
+}
+
+/* ── 讀寫 localStorage：今日已結帳累計（跨日自動歸零） ── */
+function todayISO() {
+  var d = new Date();
+  var p = function (n) { return String(n).padStart(2, '0'); };
+  return d.getFullYear() + '-' + p(d.getMonth() + 1) + '-' + p(d.getDate());
+}
+function loadDaily() {
+  try {
+    var raw = localStorage.getItem(STORAGE_DAILY);
+    daily = raw ? JSON.parse(raw) : { date: todayISO(), total: 0, count: 0 };
+    if (!daily || daily.date !== todayISO()) daily = { date: todayISO(), total: 0, count: 0 };
+    if (typeof daily.total !== 'number' || isNaN(daily.total)) daily.total = 0;
+    if (typeof daily.count !== 'number' || isNaN(daily.count)) daily.count = 0;
+  } catch (e) {
+    daily = { date: todayISO(), total: 0, count: 0 };
+  }
+  saveDaily();
+}
+function saveDaily() {
+  localStorage.setItem(STORAGE_DAILY, JSON.stringify(daily));
+}
+function updateDailyBar() {
+  document.getElementById('dailyCheckoutTotal').textContent = 'NT$' + daily.total;
+  document.getElementById('dailyCheckoutCount').textContent = daily.count + ' 桌';
+}
+
+/* ── 首次開啟：3 組虛構客人 ── */
+function seedSampleData() {
+  if (localStorage.getItem(STORAGE_SEEDED)) return;
+  var now = Date.now();
+  queue = [
+    { id: 'seed-1', number: 'A001', name: '林小姐', size: 2, time: now - 25 * 60 * 1000, status: 'waiting' },
+    { id: 'seed-2', number: 'A002', name: '陳先生', size: 4, time: now - 14 * 60 * 1000, status: 'waiting' },
+    { id: 'seed-3', number: 'A003', name: '王太太', size: 3, time: now - 5 * 60 * 1000, status: 'waiting' }
+  ];
+  nextNumber = 4;
+  saveData();
+  localStorage.setItem(STORAGE_SEEDED, '1');
+}
+
+/* ── 讀寫 localStorage：售完品項 ── */
+function loadSoldout() {
+  try {
+    var raw = localStorage.getItem(STORAGE_SOLDOUT);
+    soldout = raw ? JSON.parse(raw) : [];
+    if (!Array.isArray(soldout)) soldout = [];
+  } catch (e) { soldout = []; }
+}
+function saveSoldout() {
+  localStorage.setItem(STORAGE_SOLDOUT, JSON.stringify(soldout));
+}
+function isSoldOut(name) {
+  return soldout.indexOf(name) !== -1;
+}
+function toggleSoldout(name) {
+  var i = soldout.indexOf(name);
+  if (i >= 0) soldout.splice(i, 1); else soldout.push(name);
+  saveSoldout();
+  refreshAll();
+}
+function renderSoldoutGrid() {
+  var grid = document.getElementById('soldoutGrid');
+  grid.innerHTML = MENU.map(function (m) {
+    var off = isSoldOut(m.name);
+    return '<button type="button" class="soldout-item' + (off ? ' off' : '') + '" data-soldout="' + escapeHtml(m.name) + '" aria-pressed="' + off + '">' +
+      '<span>' + escapeHtml(m.name) + '</span><small>' + (off ? '今日售完' : '販售中') + '</small>' +
+    '</button>';
+  }).join('');
+  var c = document.getElementById('soldoutCount');
+  c.textContent = soldout.length ? '售完 ' + soldout.length + ' 項' : '';
+}
+
+/* ── 工具 ── */
+function minutesSince(time) {
+  return Math.max(0, Math.floor((Date.now() - time) / 60000));
+}
+function escapeHtml(str) {
+  return String(str).replace(/[&<>"']/g, function (ch) {
+    return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[ch];
+  });
+}
+function occupiedTables() {
+  return tables.filter(function (t) { return t.status === 'occupied'; });
+}
+
+/* ── Toast 通知 ── */
+var toastTimer = null;
+function showToast(msg) {
+  var el = document.getElementById('toast');
+  el.textContent = msg;
+  el.classList.add('show');
+  if (toastTimer) clearTimeout(toastTimer);
+  toastTimer = setTimeout(function () { el.classList.remove('show'); }, 2600);
+}
+
+/* ══════════ 分頁切換 ══════════ */
+document.querySelectorAll('.tab-btn').forEach(function (btn) {
+  btn.addEventListener('click', function () {
+    var target = btn.getAttribute('data-tab');
+    document.querySelectorAll('.tab-btn').forEach(function (b) {
+      b.classList.toggle('active', b === btn);
+    });
+    document.querySelectorAll('.tab-panel').forEach(function (panel) {
+      panel.classList.toggle('open', panel.id === target);
+    });
+    window.scrollTo(0, 0);
+  });
+});
+
+/* ══════════ 分頁徽章 ══════════ */
+function renderBadges() {
+  var waiting = queue.filter(function (i) { return i.status === 'waiting'; }).length;
+  var occupied = occupiedTables().length;
+  var notDone = orders.filter(function (o) { return o.status !== 'done' && o.status !== 'checkedout'; }).length; // 待製作＋製作中
+  document.getElementById('badgeWait').textContent = waiting;
+  document.getElementById('badgeTables').textContent = occupied;
+  document.getElementById('badgeKitchen').textContent = notDone;
+}
+
+/* ══════════ 候位渲染 ══════════ */
+function itemButtons(item) {
+  var html = '';
+  if (item.status === 'waiting') {
+    html += '<button class="btn-sm btn-call" data-action="call" data-id="' + item.id + '">叫號</button>';
+  }
+  if (item.status === 'skipped') {
+    html += '<button class="btn-sm btn-back" data-action="back" data-id="' + item.id + '">客人回來了</button>';
+  }
+  if (item.status === 'called') {
+    html += '<button class="btn-sm btn-seat" data-action="seat" data-id="' + item.id + '">入座</button>';
+  }
+  if (item.status !== 'skipped') {
+    html += '<button class="btn-sm btn-skip" data-action="skip" data-id="' + item.id + '">過號</button>';
+  }
+  return html;
+}
+function renderItem(item, metaHtml, rowClass) {
+  var div = document.createElement('div');
+  div.className = 'queue-item' + (rowClass ? ' ' + rowClass : '');
+  div.innerHTML =
+    '<div class="qnum">' + escapeHtml(item.number) + '</div>' +
+    '<div class="qinfo">' +
+      '<div class="qname">' + escapeHtml(item.name) + '</div>' +
+      '<div class="qmeta">' + metaHtml + '</div>' +
+    '</div>' +
+    '<div class="qactions">' + itemButtons(item) + '</div>';
+  return div;
+}
+function render() {
+  var calledEl  = document.getElementById('calledList');
+  var listEl    = document.getElementById('queueList');
+  var skippedEl = document.getElementById('skippedList');
+  var calledCountEl  = document.getElementById('calledCount');
+  var queueCountEl   = document.getElementById('queueCount');
+  var skippedCountEl = document.getElementById('skippedCount');
+
+  calledEl.innerHTML = '';
+  listEl.innerHTML = '';
+  skippedEl.innerHTML = '';
+
+  var called  = queue.filter(function (i) { return i.status === 'called'; });
+  var waiting = queue.filter(function (i) { return i.status === 'waiting'; });
+  var skipped = queue.filter(function (i) { return i.status === 'skipped'; });
+
+  calledCountEl.textContent  = called.length ? called.length + ' 組' : '';
+  queueCountEl.textContent   = waiting.length ? '共 ' + waiting.length + ' 組等候中' : '';
+  skippedCountEl.textContent = skipped.length ? skipped.length + ' 組' : '';
+
+  if (called.length === 0) {
+    calledEl.innerHTML = '<div class="empty">目前沒有叫號中的客人</div>';
+  } else {
+    called.forEach(function (item) {
+      var meta = '人數 <strong>' + item.size + ' 位</strong> · ' +
+        '已叫號 <strong>' + minutesSince(item.calledTime) + ' 分鐘</strong>';
+      calledEl.appendChild(renderItem(item, meta, 'called'));
+    });
+  }
+
+  if (waiting.length === 0) {
+    listEl.innerHTML = '<div class="empty">目前沒有客人在等候<br>請為下一位客人取號 ✨</div>';
+  } else {
+    waiting.forEach(function (item, index) {
+      var meta = '人數 <strong>' + item.size + ' 位</strong> · ' +
+        '已等 <strong>' + minutesSince(item.time) + ' 分鐘</strong> · ' +
+        '前面還有 <strong>' + index + ' 組</strong>';
+      listEl.appendChild(renderItem(item, meta, index === 0 ? 'next' : ''));
+    });
+  }
+
+  if (skipped.length === 0) {
+    skippedEl.innerHTML = '<div class="empty">目前沒有過號的客人</div>';
+  } else {
+    skipped.forEach(function (item) {
+      var meta = '人數 <strong>' + item.size + ' 位</strong> · ' +
+        '已等 <strong>' + minutesSince(item.time) + ' 分鐘</strong> · ' +
+        '過號 <strong>' + minutesSince(item.skippedTime) + ' 分鐘</strong>';
+      skippedEl.appendChild(renderItem(item, meta, 'skipped'));
+    });
+  }
+}
+
+/* ══════════ 桌位渲染 ══════════ */
+function renderTables() {
+  var grid = document.getElementById('tablesGrid');
+  var summary = document.getElementById('tablesSummary');
+  grid.innerHTML = '';
+
+  var freeCount = tables.filter(function (t) { return t.status === 'free'; }).length;
+  summary.textContent = '空桌 ' + freeCount + ' / ' + tables.length + ' 桌';
+
+  tables.forEach(function (t) {
+    var card = document.createElement('div');
+    card.className = 'table-card ' + (t.status === 'free' ? 'free' : 'occupied');
+    if (t.status === 'free') {
+      card.innerHTML =
+        '<div class="tno">' + t.number + ' 號桌</div>' +
+        '<div class="tcap">容量 ' + t.capacity + ' 人</div>' +
+        '<div class="tstatus">空桌</div>';
+    } else {
+      card.innerHTML =
+        '<div class="tno">' + t.number + ' 號桌</div>' +
+        '<div class="tcap">容量 ' + t.capacity + ' 人</div>' +
+        '<div class="tstatus">用餐中</div>' +
+        '<div class="tguest"><strong>' + escapeHtml(t.guestName) + '</strong><br>' +
+          t.size + ' 位 · 已用餐 ' + minutesSince(t.since) + ' 分鐘</div>' +
+        '<button class="btn-release" data-action="release-table" data-table-id="' + t.id + '">結束用餐</button>';
+    }
+    grid.appendChild(card);
+  });
+}
+
+/* ══════════ 點餐：菜單與待送單 ══════════ */
+function renderMenu() {
+  var wrap = document.getElementById('menuList');
+  wrap.innerHTML = '';
+  ['甜點', '飲料'].forEach(function (cat) {
+    var h = document.createElement('div');
+    h.className = 'menu-cat';
+    h.textContent = cat;
+    wrap.appendChild(h);
+
+    MENU.forEach(function (item, idx) {
+      if (item.cat !== cat) return;
+      var off = isSoldOut(item.name);
+      var row = document.createElement('div');
+      row.className = 'menu-item' + (off ? ' soldout' : '') + (item.img ? ' has-img' : '');
+      var imgHtml = item.img
+        ? '<img class="mi-img" src="' + escapeHtml(item.img) + '" alt="' + escapeHtml(item.name) + '" width="96" height="80" loading="lazy">'
+        : '';
+      row.innerHTML =
+        imgHtml +
+        '<div class="mi-info">' +
+          '<div><span class="mi-name">' + escapeHtml(item.name) + '</span><span class="mi-unit">' + escapeHtml(item.unit) + '</span>' +
+            (off ? '<span class="mi-soldout">今日售完</span>' : '') + '</div>' +
+          '<div class="mi-price">$' + item.price + '</div>' +
+          '<div class="mi-allergen"><strong>過敏原：</strong>' + escapeHtml(item.allergen) + '</div>' +
+        '</div>' +
+        '<button class="btn-add" data-menu-idx="' + idx + '"' + (off ? ' disabled' : '') + '>' + (off ? '今日售完' : '＋ 加入') + '</button>';
+      wrap.appendChild(row);
+    });
+  });
+}
+
+function renderQuickNotes() {
+  var wrap = document.getElementById('quickNotes');
+  wrap.innerHTML = QUICK_NOTES.map(function (note) {
+    return '<button type="button" class="qn-chip" data-quick-note="' + escapeHtml(note) + '">＋ ' + escapeHtml(note) + '</button>';
+  }).join('');
+}
+
+function selectedTable() {
+  var sel = document.getElementById('orderTableSelect');
+  var id = sel.value;
+  if (!id) return null;
+  return tables.find(function (t) { return t.id === id && t.status === 'occupied'; }) || null;
+}
+
+function updateSendButton() {
+  var btn = document.getElementById('sendOrderBtn');
+  var t = selectedTable();
+  var hasItems = t ? getSlip(t.id).items.length > 0 : false;
+  btn.disabled = !(t && hasItems);
+}
+
+function renderCart() {
+  var area = document.getElementById('cartArea');
+  var t = selectedTable();
+  if (!t) { area.innerHTML = ''; updateSendButton(); return; }
+
+  var slip = getSlip(t.id);
+
+  if (slip.items.length === 0) {
+    area.innerHTML = '<div class="empty">這張待送單是空的<br>請從菜單加入餐點 🍰</div>';
+    updateSendButton();
+    return;
+  }
+
+  var html = slip.items.map(function (line, i) {
+    return '<div class="cart-line">' +
+      '<div class="cart-name">' + escapeHtml(line.name) + ' <small>$' + line.price + ' / ' + escapeHtml(line.unit) + '</small></div>' +
+      '<button class="qty-btn" data-cart-dec="' + i + '" aria-label="減少">－</button>' +
+      '<span class="qty-num">' + line.qty + '</span>' +
+      '<button class="qty-btn" data-cart-inc="' + i + '" aria-label="增加">＋</button>' +
+    '</div>';
+  }).join('');
+  html += allergyWarningHtml(slip); // 警示：小計正上方
+  html += '<div class="cart-subtotal"><span>小計</span><span class="sum">NT$' + slipTotal(slip) + '</span></div>';
+  area.innerHTML = html;
+  updateSendButton(); // 警示不停用送單（保留送單按鈕）
+}
+
+function renderOrderTab() {
+  var sel = document.getElementById('orderTableSelect');
+  var hint = document.getElementById('noTablesHint');
+  var area = document.getElementById('orderArea');
+  var noteEl = document.getElementById('orderNote');
+  var occupied = occupiedTables();
+
+  var prevValue = sel.value;
+  sel.innerHTML = '<option value="">— 請選擇桌號 —</option>' +
+    occupied.map(function (t) {
+      return '<option value="' + t.id + '">' + t.number + ' 號桌｜' +
+        escapeHtml(t.guestName) + '（' + t.size + ' 位）</option>';
+    }).join('');
+
+  if (occupied.length === 0) {
+    sel.style.display = 'none';
+    hint.style.display = 'block';
+    area.style.display = 'none';
+    sel.value = '';
+    updateSendButton();
+    return;
+  }
+
+  sel.style.display = '';
+  hint.style.display = 'none';
+
+  var stillValid = occupied.some(function (t) { return t.id === prevValue; });
+  sel.value = stillValid ? prevValue : '';
+
+  var t = selectedTable();
+  if (t) {
+    area.style.display = 'block';
+    document.getElementById('orderTableLabel').textContent =
+      t.number + ' 號桌｜' + t.guestName + '（' + t.size + ' 位）';
+    var slip = getSlip(t.id);
+    noteEl.value = slip.note; // 載入該桌的備註
+    renderMenu();
+    renderCart();
+  } else {
+    area.style.display = 'none';
+    noteEl.value = '';
+    updateSendButton();
+  }
+}
+
+function addToSlip(idx) {
+  var t = selectedTable();
+  if (!t) { showToast('請先選擇用餐中的桌號'); return; }
+  var item = MENU[idx];
+  if (!item) return;
+  if (isSoldOut(item.name)) {
+    showToast(item.name + ' 今日售完');
+    return;
+  }
+  var slip = getSlip(t.id);
+  var line = slip.items.find(function (l) { return l.name === item.name; });
+  if (line) {
+    line.qty += 1;
+  } else {
+    slip.items.push({ name: item.name, unit: item.unit, price: item.price, qty: 1 });
+  }
+  saveSlips();
+  renderCart();
+}
+
+function submitOrder() {
+  var t = selectedTable();
+  if (!t) { showToast('請先選擇用餐中的桌號'); return; }
+  var slip = getSlip(t.id);
+  if (slip.items.length === 0) {
+    showToast('這張待送單是空的');
+    return;
+  }
+
+  // 待送單內含售完品項 → 擋下送單，提示先移除
+  var soldNames = slip.items
+    .filter(function (l) { return isSoldOut(l.name); })
+    .map(function (l) { return l.name; });
+  if (soldNames.length > 0) {
+    window.alert('以下餐點今日售完，請先從待送單移除：\n\n' + soldNames.join('、') + '\n\n（售完狀態可在「廚房 → 售完管理」切換）');
+    return;
+  }
+
+  var note = note_value_trim();
+  var total = slipTotal(slip);
+  var order = {
+    id: 'o-' + Date.now() + '-' + Math.floor(Math.random() * 10000),
+    orderNo: formatOrderNo(nextOrderNumber),
+    tableId: t.id,
+    tableNumber: t.number,
+    guestName: t.guestName,
+    size: t.size,
+    items: slip.items.map(function (l) {
+      return { name: l.name, unit: l.unit, price: l.price, qty: l.qty };
+    }),
+    total: total,
+    note: note,
+    status: 'pending',
+    time: Date.now()
+  };
+  orders.push(order);
+  nextOrderNumber += 1;
+  saveOrders();
+
+  // 僅清空「該桌」待送單
+  slips[t.id] = { items: [], note: '' };
+  saveSlips();
+
+  document.getElementById('orderNote').value = '';
+  renderCart();
+  renderKitchen();
+  renderBadges();
+  showToast('已送出！單號 ' + order.orderNo + '（NT$' + total + '）');
+}
+function note_value_trim() {
+  return document.getElementById('orderNote').value.trim();
+}
+
+/* ══════════ 本桌已送單與結帳 ══════════ */
+function renderTableOrders() {
+  var card = document.getElementById('tableOrdersCard');
+  var listEl = document.getElementById('tableOrdersList');
+  var statusEl = document.getElementById('tableOrdersStatus');
+  var totalEl = document.getElementById('tableOrdersTotal');
+  var btn = document.getElementById('checkoutBtn');
+
+  var t = selectedTable();
+  if (!t) { card.style.display = 'none'; return; }
+  card.style.display = 'block';
+
+  var recs = orders
+    .filter(function (o) { return o.tableId === t.id && o.status !== 'checkedout'; })
+    .sort(function (a, b) { return a.time - b.time; });
+
+  if (recs.length === 0) {
+    listEl.innerHTML = '<div class="empty">這桌還沒送出訂單</div>';
+    statusEl.textContent = '尚無訂單';
+    totalEl.textContent = 'NT$0';
+    btn.disabled = true;
+    btn.textContent = '餐點全部完成才能結帳';
+    return;
+  }
+
+  var sum = 0, notDone = 0;
+  listEl.innerHTML = recs.map(function (o) {
+    sum += (typeof o.total === 'number') ? o.total : 0;
+    if (o.status !== 'done') notDone += 1;
+    var pill = o.status === 'pending'
+      ? '<span class="pill pill-pending">待製作</span>'
+      : o.status === 'preparing'
+        ? '<span class="pill pill-preparing">製作中</span>'
+        : '<span class="pill pill-done">已完成</span>';
+    var items = o.items.map(function (l) { return l.name + ' ×' + l.qty; }).join('、');
+    return '<div class="to-line">' +
+      '<div class="to-info">' +
+        '<div class="to-no">' + escapeHtml(o.orderNo) + ' ' + pill + '</div>' +
+        '<div class="to-items">' + escapeHtml(items) + '</div>' +
+      '</div>' +
+      '<div class="to-right"><div class="to-total">NT$' + ((typeof o.total === 'number') ? o.total : 0) + '</div></div>' +
+    '</div>';
+  }).join('');
+
+  totalEl.textContent = 'NT$' + sum;
+  if (notDone === 0) {
+    statusEl.textContent = '餐點全部完成 ✔';
+    btn.disabled = false;
+    btn.textContent = '結帳 NT$' + sum;
+  } else {
+    statusEl.textContent = '還有 ' + notDone + ' 單未完成';
+    btn.disabled = true;
+    btn.textContent = '餐點全部完成才能結帳';
+  }
+}
+
+function checkoutTable() {
+  var t = selectedTable();
+  if (!t) return;
+  var recs = orders.filter(function (o) { return o.tableId === t.id && o.status !== 'checkedout'; });
+  if (recs.length === 0) return;
+  var allDone = recs.every(function (o) { return o.status === 'done'; });
+  if (!allDone) {
+    showToast('餐點全部完成才能結帳');
+    return;
+  }
+  var sum = recs.reduce(function (s, o) { return s + ((typeof o.total === 'number') ? o.total : 0); }, 0);
+  if (!window.confirm(t.number + ' 號桌・' + t.guestName + ' 共 ' + recs.length + ' 單，結帳 NT$' + sum + '？')) return;
+
+  var now = Date.now();
+  recs.forEach(function (o) { o.status = 'checkedout'; o.checkedOutTime = now; });
+  saveOrders();
+
+  // 清空桌況、清掉該桌待送單
+  t.status = 'free'; t.guestName = null; t.size = null; t.since = null;
+  saveTables();
+  delete slips[t.id];
+  saveSlips();
+
+  // 累計今日已結帳
+  daily.total += sum;
+  daily.count += 1;
+  saveDaily();
+
+  refreshAll();
+  showToast(t.number + ' 號桌已結帳 NT$' + sum + '，桌位已清空 ✔');
+}
+
+/* ══════════ 廚房：未完成訂單 ══════════ */
+function renderKitchen() {
+  var colPending   = document.getElementById('colPending');
+  var colPreparing = document.getElementById('colPreparing');
+  var colDone      = document.getElementById('colDone');
+  var countEl      = document.getElementById('kitchenCount');
+  var cntPending   = document.getElementById('cntPending');
+  var cntPreparing = document.getElementById('cntPreparing');
+  var cntDone      = document.getElementById('cntDone');
+
+  colPending.innerHTML = '';
+  colPreparing.innerHTML = '';
+  colDone.innerHTML = '';
+
+  var pending   = orders.filter(function (o) { return o.status === 'pending'; });
+  var preparing = orders.filter(function (o) { return o.status === 'preparing'; });
+  var done      = orders.filter(function (o) { return o.status === 'done'; });
+
+  var notDone = pending.length + preparing.length;
+  countEl.textContent = notDone ? '未完成 ' + notDone + ' 單' : '';
+  cntPending.textContent = pending.length;
+  cntPreparing.textContent = preparing.length;
+  cntDone.textContent = done.length;
+
+  function buildCard(o, column) {
+    var isAllergy = /過敏|忌口|不能吃|不吃/.test(o.note || '');
+    var total = (typeof o.total === 'number') ? o.total
+      : o.items.reduce(function (s, l) { return s + l.price * l.qty; }, 0);
+    var div = document.createElement('div');
+    div.className = 'order-card';
+
+    // ② 桌號、單號、送單時間
+    var headHtml =
+      '<div class="order-no">' + escapeHtml(o.orderNo) + '</div>' +
+      '<div class="order-where">' + o.tableNumber + ' 號桌｜' + escapeHtml(o.guestName) + '（' + o.size + ' 位）</div>' +
+      '<div class="order-time">' + new Date(o.time).toLocaleTimeString('zh-Hant', { hour: '2-digit', minute: '2-digit' }) + ' 送單</div>';
+
+    // ① 備註置頂：過敏紅底醒目、其他黃底
+    var noteHtml = '';
+    if (o.note) {
+      noteHtml = '<div class="order-note' + (isAllergy ? ' allergy' : '') + '">' +
+        (isAllergy ? '⚠ ' : '') + escapeHtml(o.note) + '</div>';
+    }
+
+    var itemsHtml = o.items.map(function (l) {
+      return '<li><span>' + escapeHtml(l.name) + ' × ' + l.qty + '</span><span>' + nt(l.price * l.qty) + '</span></li>';
+    }).join('');
+
+    var doneLine = '';
+    if (column === 'done' && o.doneTime) {
+      doneLine = '<div class="order-time">出餐 ' + new Date(o.doneTime).toLocaleTimeString('zh-Hant', { hour: '2-digit', minute: '2-digit' }) + '</div>';
+    }
+
+    var btnHtml = '';
+    if (column === 'pending') {
+      btnHtml = '<button class="btn-prep" data-action="start-prep" data-order-id="' + o.id + '">開始製作</button>';
+    } else if (column === 'preparing') {
+      btnHtml = '<button class="btn-done" data-action="finish-order" data-order-id="' + o.id + '">出餐完成</button>';
+    }
+
+    div.innerHTML = noteHtml + headHtml +
+      '<ul class="order-items">' + itemsHtml + '</ul>' +
+      '<div class="order-total"><span>NT$ 小計</span><strong>NT$' + total + '</strong></div>' +
+      doneLine + btnHtml;
+    return div;
+  }
+
+  if (pending.length === 0 && preparing.length === 0 && done.length === 0) {
+    document.getElementById('colPending').innerHTML = '<div class="empty">沒有待製作的訂單</div>';
+    document.getElementById('colPreparing').innerHTML = '<div class="empty">沒有製作中的訂單</div>';
+    document.getElementById('colDone').innerHTML = '<div class="empty">尚無已完成的訂單</div>';
+    return;
+  }
+
+  pending.sort(function (a, b) { return a.time - b.time; });
+  preparing.sort(function (a, b) { return a.time - b.time; });
+  done.sort(function (a, b) { return (b.doneTime || b.time) - (a.doneTime || a.time); });
+
+  if (pending.length === 0) colPending.innerHTML = '<div class="empty">沒有待製作的訂單 ☕</div>';
+  else pending.forEach(function (o) { colPending.appendChild(buildCard(o, 'pending')); });
+
+  if (preparing.length === 0) colPreparing.innerHTML = '<div class="empty">沒有製作中的訂單</div>';
+  else preparing.forEach(function (o) { colPreparing.appendChild(buildCard(o, 'preparing')); });
+
+  if (done.length === 0) colDone.innerHTML = '<div class="empty">尚無已完成的訂單</div>';
+  else done.slice(0, 20).forEach(function (o) { colDone.appendChild(buildCard(o, 'done')); });
+}
+
+/* ── 全部重繪 ── */
+function refreshAll() {
+  render();
+  renderTables();
+  renderOrderTab();
+  renderTableOrders();
+  renderKitchen();
+  renderBadges();
+  renderSoldoutGrid();
+  updateDailyBar();
+}
+
+/* ══════════ 選桌 Modal ══════════ */
+function openSeatModal(item) {
+  seatingId = item.id;
+  document.getElementById('seatModalSub').innerHTML =
+    '號碼 <strong>' + escapeHtml(item.number) + '</strong> · ' +
+    '姓名 <strong>' + escapeHtml(item.name) + '</strong> · ' +
+    '共 <strong>' + item.size + ' 位</strong>';
+
+  var body = document.getElementById('seatModalBody');
+  var suitable = tables.filter(function (t) {
+    return t.status === 'free' && t.capacity >= item.size;
+  });
+
+  if (suitable.length === 0) {
+    body.innerHTML =
+      '<div class="modal-hint">目前沒有可以坐下 ' + item.size + ' 人的空桌。' +
+      '<br>請稍候、確認是否翻桌完成，或安排分桌。</div>';
+  } else {
+    body.innerHTML = suitable.map(function (t) {
+      return '<button class="modal-table-btn" data-table-id="' + t.id + '">' +
+        '<span>' + t.number + ' 號桌</span>' +
+        '<small>容量 ' + t.capacity + ' 人・空桌</small>' +
+      '</button>';
+    }).join('');
+  }
+  document.getElementById('seatModal').classList.add('open');
+}
+function closeSeatModal() {
+  seatingId = null;
+  document.getElementById('seatModal').classList.remove('open');
+}
+function seatGuestToTable(tableId) {
+  if (!seatingId) return;
+  var idx = queue.findIndex(function (i) { return i.id === seatingId; });
+  var tIdx = tables.findIndex(function (t) { return t.id === tableId; });
+  if (idx === -1 || tIdx === -1) { closeSeatModal(); return; }
+  var item = queue[idx];
+  var table = tables[tIdx];
+
+  if (table.status !== 'free' || table.capacity < item.size) {
+    openSeatModal(item);
+    return;
+  }
+
+  table.status = 'occupied';
+  table.guestName = item.name;
+  table.size = item.size;
+  table.since = Date.now();
+  queue.splice(idx, 1);
+
+  saveData();
+  saveTables();
+  closeSeatModal();
+  refreshAll();
+  showToast(item.number + ' ' + item.name + ' 入座 ' + table.number + ' 號桌');
+}
+
+/* ══════════ 取號 ══════════ */
+function renderSizeButtons() {
+  var group = document.getElementById('sizeGroup');
+  group.innerHTML = '';
+  [1, 2, 3, 4].forEach(function (n) {
+    var btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'size-btn' + (n === selectedSize ? ' active' : '');
+    btn.textContent = n + ' 人';
+    btn.setAttribute('aria-pressed', n === selectedSize ? 'true' : 'false');
+    btn.addEventListener('click', function () {
+      selectedSize = n;
+      renderSizeButtons();
+    });
+    group.appendChild(btn);
+  });
+}
+function takeNumber() {
+  var input = document.getElementById('guestName');
+  var errorEl = document.getElementById('nameError');
+  var name = input.value.trim();
+
+  if (!name) {
+    errorEl.classList.add('show');
+    input.focus();
+    return;
+  }
+  errorEl.classList.remove('show');
+
+  queue.push({
+    id: 'q-' + Date.now() + '-' + Math.floor(Math.random() * 10000),
+    number: formatNumber(nextNumber),
+    name: name,
+    size: selectedSize,
+    time: Date.now(),
+    status: 'waiting'
+  });
+  nextNumber += 1;
+  saveData();
+  render();
+  renderBadges();
+
+  input.value = '';
+  input.focus();
+}
+
+/* ══════════ 全域點擊委派 ══════════ */
+document.body.addEventListener('click', function (e) {
+  var addBtn = e.target.closest('button[data-menu-idx]');
+  if (addBtn) {
+    if (addBtn.disabled) return; // 售完不能加入
+    addToSlip(parseInt(addBtn.getAttribute('data-menu-idx'), 10));
+    return;
+  }
+  var soldBtn = e.target.closest('button[data-soldout]');
+  if (soldBtn) {
+    toggleSoldout(soldBtn.getAttribute('data-soldout'));
+    return;
+  }
+  var inc = e.target.closest('button[data-cart-inc]');
+  if (inc) {
+    var iInc = parseInt(inc.getAttribute('data-cart-inc'), 10);
+    var tInc = selectedTable();
+    if (tInc) {
+      var slipInc = getSlip(tInc.id);
+      if (slipInc.items[iInc]) { slipInc.items[iInc].qty += 1; saveSlips(); renderCart(); }
+    }
+    return;
+  }
+  var dec = e.target.closest('button[data-cart-dec]');
+  if (dec) {
+    var iDec = parseInt(dec.getAttribute('data-cart-dec'), 10);
+    var tDec = selectedTable();
+    if (tDec) {
+      var slipDec = getSlip(tDec.id);
+      if (slipDec.items[iDec]) {
+        slipDec.items[iDec].qty -= 1;
+        if (slipDec.items[iDec].qty <= 0) slipDec.items.splice(iDec, 1); // 歸零就移除
+        saveSlips();
+        renderCart();
+      }
+    }
+    return;
+  }
+  // 快捷備註：加入備註欄（不重複加入）
+  var quickBtn = e.target.closest('button[data-quick-note]');
+  if (quickBtn) {
+    var tCur = selectedTable();
+    if (!tCur) return;
+    var slipCur = getSlip(tCur.id);
+    var note = quickBtn.getAttribute('data-quick-note');
+    var parts = slipCur.note.split('、').map(function (s) { return s.trim(); }).filter(Boolean);
+    if (parts.indexOf(note) === -1) {
+      parts.push(note);
+      slipCur.note = parts.join('、');
+      document.getElementById('orderNote').value = slipCur.note;
+      saveSlips();
+      renderCart(); // 過敏警示即時連動
+    }
+    return;
+  }
+
+  var btn = e.target.closest('button[data-action]');
+  if (!btn) return;
+  var action = btn.getAttribute('data-action');
+
+  // 廚房看板：待製作 → 製作中 → 已完成
+  if (action === 'start-prep' || action === 'finish-order') {
+    var orderId = btn.getAttribute('data-order-id');
+    var oIdx = orders.findIndex(function (o) { return o.id === orderId; });
+    if (oIdx === -1) return;
+    var o = orders[oIdx];
+    if (action === 'start-prep' && o.status === 'pending') {
+      o.status = 'preparing';
+      o.prepTime = Date.now();
+      saveOrders();
+      renderKitchen();
+      renderBadges();
+      showToast(o.orderNo + ' 開始製作 🍳');
+    } else if (action === 'finish-order' && o.status === 'preparing') {
+      o.status = 'done';
+      o.doneTime = Date.now();
+      saveOrders();
+      renderKitchen();
+      renderBadges();
+      showToast(o.orderNo + ' 出餐完成 ✔');
+    }
+    return;
+  }
+
+  // 桌位：結束用餐並釋出（同時清掉該桌的待送單）
+  if (action === 'release-table') {
+    var tableId = btn.getAttribute('data-table-id');
+    var tIdx = tables.findIndex(function (t) { return t.id === tableId; });
+    if (tIdx === -1) return;
+    var t = tables[tIdx];
+    if (window.confirm(t.number + ' 號桌（' + t.guestName + '，' + t.size + ' 位）結束用餐並釋出桌位？')) {
+      t.status = 'free';
+      t.guestName = null;
+      t.size = null;
+      t.since = null;
+      delete slips[t.id]; // 翻桌後清掉殘留的待送單
+      saveSlips();
+      saveTables();
+      refreshAll();
+    }
+    return;
+  }
+
+  // 候位組：叫號／過號／回來／入座
+  var id = btn.getAttribute('data-id');
+  var idx = queue.findIndex(function (item) { return item.id === id; });
+  if (idx === -1) return;
+
+  if (action === 'call') {
+    queue[idx].status = 'called';
+    queue[idx].calledTime = Date.now();
+    saveData();
+    refreshAll();
+  } else if (action === 'skip') {
+    queue[idx].status = 'skipped';
+    queue[idx].skippedTime = Date.now();
+    saveData();
+    refreshAll();
+  } else if (action === 'back') {
+    var back = queue.splice(idx, 1)[0];
+    back.status = 'waiting';
+    delete back.calledTime;
+    delete back.skippedTime;
+    queue.push(back);
+    saveData();
+    refreshAll();
+  } else if (action === 'seat') {
+    if (queue[idx].status !== 'called') return; // 僅叫號中可入座
+    openSeatModal(queue[idx]);
+  }
+});
+
+/* 選桌視窗 */
+document.getElementById('seatModalBody').addEventListener('click', function (e) {
+  var btn = e.target.closest('button[data-table-id]');
+  if (!btn) return;
+  seatGuestToTable(btn.getAttribute('data-table-id'));
+});
+document.getElementById('seatModalClose').addEventListener('click', closeSeatModal);
+document.getElementById('seatModal').addEventListener('click', function (e) {
+  if (e.target.id === 'seatModal') closeSeatModal();
+});
+document.addEventListener('keydown', function (e) {
+  if (e.key === 'Escape') closeSeatModal();
+});
+
+/* 點餐區 */
+document.getElementById('orderTableSelect').addEventListener('change', refreshAll);
+document.getElementById('sendOrderBtn').addEventListener('click', submitOrder);
+document.getElementById('checkoutBtn').addEventListener('click', checkoutTable);
+document.getElementById('orderNote').addEventListener('input', function () {
+  var t = selectedTable();
+  if (!t) return;
+  var slip = getSlip(t.id);
+  slip.note = this.value;
+  saveSlips();
+  renderCart(); // 過敏警示即時連動
+});
+
+document.getElementById('takeNumberBtn').addEventListener('click', takeNumber);
+document.getElementById('resetBtn').addEventListener('click', resetForOpening);
+document.getElementById('guestName').addEventListener('keydown', function (e) {
+  if (e.key === 'Enter') takeNumber();
+});
+document.getElementById('guestName').addEventListener('input', function () {
+  document.getElementById('nameError').classList.remove('show');
+});
+
+/* ══════════ 重新開店：清空所有營運資料 ══════════ */
+function resetForOpening() {
+  var ok = window.confirm(
+    '確定清空所有候位與訂單資料，重新開店？\n\n' +
+    '將清空：候位名單與號碼（回到 A001）、桌位與客名、待送單、\n' +
+    '廚房訂單與單號（回到 K001）、售完標記、今日已結帳累計。\n\n' +
+    '此動作無法復原！'
+  );
+  if (!ok) return;
+
+  [STORAGE_LIST, STORAGE_COUNTER, STORAGE_TABLES, STORAGE_SLIPS,
+   STORAGE_ORDERS, STORAGE_ORDER_COUNTER, STORAGE_DAILY, STORAGE_SOLDOUT]
+    .forEach(function (k) { localStorage.removeItem(k); });
+  // STORAGE_SEEDED 保留：重新開店不會自動塞回虛構客人
+
+  loadData();
+  loadTables();  // 重新建立預設 6 桌（全部空桌）
+  loadOrders();
+  loadSlips();
+  loadDaily();
+  loadSoldout();
+  selectedSize = 2;
+  renderSizeButtons();
+  refreshAll();
+  showToast('已清空並重新開店 ✨');
+}
+
+/* ── 啟動 ── */
+loadData();
+seedSampleData();
+loadData();
+loadTables();
+loadOrders();
+loadSlips();
+loadDaily();
+loadSoldout();
+renderSizeButtons();
+renderQuickNotes();
+renderSoldoutGrid();
+render();
+renderTables();
+renderOrderTab();
+renderTableOrders();
+renderKitchen();
+renderBadges();
+updateDailyBar();
+setInterval(refreshAll, 30000);
+</script>
+</body>
+</html>
